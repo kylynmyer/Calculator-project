@@ -162,6 +162,12 @@ public class Calculator extends JFrame implements ActionListener {
      *   - If the display currently shows "0", replace it (don't show "07")
      *   - Otherwise, add the digit to the end of what's already there
      */
+    public class CalculatorModel {
+        private double firstOperand = 0;
+        private String currentOperator = "";
+        private boolean startNewNumber = true;
+        private String displayValue = "0";
+    }
     private void appendDigit(String digit) {
         if (startNewNumber) {
             display.setText(digit);
