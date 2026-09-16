@@ -52,7 +52,7 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: set default close operation to EXIT_ON_CLOSE
         // TODO: set resizable to false
         setTitle("Calculator");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
 
         display = new JTextField("0");
@@ -69,6 +69,8 @@ public class Calculator extends JFrame implements ActionListener {
 
         pack();
         setLocationRelativeTo(null);
+        setVisible(true);
+    
 
         // ── Step 4: Build the display ────────────────────────────────────────
         // TODO: create a new JTextField starting at "0"
@@ -131,10 +133,38 @@ public class Calculator extends JFrame implements ActionListener {
     //  actionPerformed — called when ANY button is clicked
     // ────────────────────────────────────────────────────────────────────────
 
+    public class CalculatorView extends JFrame {
+        public void setDisplay(String text) {
+            display.setText(text);
+        }
+        public void addButtonListener(ActionListener l) {
+            for (JButton btn : buttons) {
+                btn.addActionListener(l);
+            }
+        }
+        public void show() {
+            setVisible(true);
+        }
+    }
+    public class CalculatorController implements ActionListener {
+        public CalculatorController() {
+            model = new CalculatorModel();
+            view = new CalculatorView();
+            view.addButtonListener(this);
+            view.show();
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         // e.getActionCommand() gives you the button label that was clicked
         String cmd = e.getActionCommand();
+        switch (cmd) {
+            case "=" -> model.computeResult();
+            default -> model.appendDigit(cmd);
+        }
+        view.setDisplay(model.getDisplayValue());
+
 
         // ── Step 8: Route each button to the right method ────────────────────
         // HINT: use a switch statement, just like in Pong you checked
@@ -167,21 +197,21 @@ public class Calculator extends JFrame implements ActionListener {
         private String currentOperator = "";
         private boolean startNewNumber = true;
         private String displayValue = "0";
-    }
-    private void appendDigit(String digit) {
-        if (startNewNumber) {
-            display.setText(digit);
-            startNewNumber = false;
-        } else {
-            String current = display.getText();
-            if (current.equals("0")) {
-                display.setText(digit);
-            } else {
-                display.setText(current + digit);
-            }
-        }
-        // TODO: your code here
 
+    
+        private void appendDigit(String digit) {
+            if (startNewNumber) {
+                displayValue = digit;
+                startNewNumber = false;
+            } else {
+                displayValue = displayValue.equals("0") ? digit : displayValue + digit;
+            }
+            // TODO: your code here
+
+        }
+        public String getDisplayValue() {
+            return displayValue;
+        }
     }
 
     /**
@@ -220,16 +250,10 @@ public class Calculator extends JFrame implements ActionListener {
         double secondOperand = Double.parseDouble(display.getText());
         double result = 0;
         switch (currentOperator) {
-            case "+":
-                result = firstOperand + secondOperand;
-                break;
-            case "-":
-                result = firstOperand - secondOperand;
-                break;
-            case "*":
-                result = firstOperand * secondOperand;
-                break;
-            case "/":
+            case "+" -> result = firstOperand + secondOperand;
+            case "-" -> result = firstOperand - secondOperand;
+            case "*" -> result = firstOperand * secondOperand;
+            case "/" -> {
                 if (secondOperand == 0) {
                     display.setText("Error");
                     currentOperator = "";
@@ -237,8 +261,11 @@ public class Calculator extends JFrame implements ActionListener {
                     return;
                 }
                 result = firstOperand / secondOperand;
-                break;
+            }
         }
+        display.setText(formatResult(result));
+        currentOperator = "";
+        startNewNumber = true;
         // Sprint 2
     }
 
