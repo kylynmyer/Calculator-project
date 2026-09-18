@@ -21,6 +21,9 @@ public class Calculator extends JFrame implements ActionListener {
     // This is the text box at the top that shows numbers.
     // In Pong you had a score — this is like that, but it shows input too.
     private JTextField display;
+    private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
+    private CalculatorModel model;
+    private CalculatorView view;
 
     // ── Step 2: Declare your state fields ───────────────────────────────────
     // You need to know: what was the first number the user typed?
@@ -92,6 +95,7 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: complete this loop
         for (String label : BUTTON_LABELS) {
             JButton btn = createButton(label);
+            buttons.add(btn);
             buttonPanel.add(btn);
             // TODO: add btn to buttonPanel
         }
