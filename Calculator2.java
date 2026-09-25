@@ -15,7 +15,7 @@ import java.awt.event.*;
  *   - You used awt and swing for drawing
  *   - This is the same idea — just buttons instead of a game loop
  */
-public class Calculator extends JFrame implements ActionListener {
+public class Calculator2 extends JFrame implements ActionListener {
 
     // ── Step 1: Declare your display field ──────────────────────────────────
     // This is the text box at the top that shows numbers.
@@ -48,7 +48,7 @@ public class Calculator extends JFrame implements ActionListener {
     //  CONSTRUCTOR — builds the window
     // ────────────────────────────────────────────────────────────────────────
 
-    public Calculator() {
+    public Calculator2() {
 
         // ── Step 3: Set up the window ────────────────────────────────────────
         // TODO: set the title to "Calculator"
@@ -58,6 +58,20 @@ public class Calculator extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
+        display = new JTextField("0");
+        display.setHorizontalAlignment(JTextField.RIGHT);
+        display.setEditable(false);
+
+        display.setFont(new Font("SansSerif", Font.BOLD, 28));
+        display.setBackground(new Color(30, 30, 30));
+        display.setForeground(Color.WHITE);
+        display.setPreferredSize(new Dimension(300, 70));
+
+        setLayout(new BorderLayout());
+        add(display, BorderLayout.NORTH);
+
+        pack();
+        setLocationRelativeTo(null);
 
         // ── Step 4: Build the display ────────────────────────────────────────
         // TODO: create a new JTextField starting at "0"
@@ -67,13 +81,6 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: set background to new Color(30, 30, 30)   ← dark
         // TODO: set foreground to Color.WHITE
         // TODO: set preferred size to new Dimension(300, 70)
-        display = new JTextField("0");
-        display.setHorizontalAlignment(JTextField.RIGHT);
-        display.setEditable(false);
-        display.setFont(new Font("SansSerif", Font.BOLD, 28));
-        display.setBackground(new Color(30, 30, 30));
-        display.setForeground(Color.WHITE);
-        display.setPreferredSize(new Dimension(300, 70));
 
 
         // ── Step 5: Build the button panel ───────────────────────────────────
@@ -89,7 +96,7 @@ public class Calculator extends JFrame implements ActionListener {
             buttonPanel.add(btn);
             // TODO: add btn to buttonPanel
         }
-
+        add(buttonPanel, BorderLayout.CENTER);
         // ── Step 6: Add display and buttons to the window ────────────────────
         // TODO: set layout to new BorderLayout()
         // TODO: add display to BorderLayout.NORTH
@@ -97,12 +104,6 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: call pack() to auto-size the window
         // TODO: call setLocationRelativeTo(null) to center on screen
         // TODO: call setVisible(true)
-        setLayout(new BorderLayout());
-        add(display, BorderLayout.NORTH);
-        add(buttonPanel, BorderLayout.CENTER);
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
 
     }
 
@@ -124,19 +125,6 @@ public class Calculator extends JFrame implements ActionListener {
         // + - * /   → dark gray (80, 80, 80), orange text
         // numbers   → dark (60, 60, 60), white text
         // TODO: write the if/else chain for button colors
-        if (label.equals("=")) {
-            btn.setBackground(new Color(255, 149, 0));
-            btn.setForeground(Color.WHITE);
-        } else if (label.equals("C") || label.equals("⌫") || label.equals("%") || label.equals("+/-")) {
-            btn.setBackground(new Color(100, 100, 100));
-            btn.setForeground(Color.WHITE);
-        } else if (label.equals("+") || label.equals("-") || label.equals("*") || label.equals("/")) {
-            btn.setBackground(new Color(80, 80, 80));
-            btn.setForeground(new Color(255, 149, 0));
-        } else {
-            btn.setBackground(new Color(60, 60, 60));
-            btn.setForeground(Color.WHITE);
-        }
 
 
         return btn;
@@ -162,16 +150,6 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: route "." to appendDecimal()
         // TODO: route "+", "-", "*", "/" to setOperator(cmd)
         // TODO: route everything else (digits) to appendDigit(cmd)
-        switch (cmd) {
-            case "C" -> clearAll();
-            case "⌫" -> backspace();
-            case "+/-" -> toggleSign();
-            case "%" -> applyPercent();
-            case "=" -> computeResult();
-            case "." -> appendDecimal();
-            case "+", "-", "*", "/" -> setOperator(cmd);
-            default -> appendDigit(cmd);
-        }
 
     }
 
@@ -188,7 +166,6 @@ public class Calculator extends JFrame implements ActionListener {
      *   - Otherwise, add the digit to the end of what's already there
      */
     private void appendDigit(String digit) {
-        // TODO: your code here
         if (startNewNumber) {
             display.setText(digit);
             startNewNumber = false;
@@ -200,6 +177,7 @@ public class Calculator extends JFrame implements ActionListener {
                 display.setText(current + digit);
             }
         }
+        // TODO: your code here
 
     }
 
@@ -213,11 +191,11 @@ public class Calculator extends JFrame implements ActionListener {
      *   - startNewNumber goes back to true
      */
     private void clearAll() {
-        // TODO: your code here
         display.setText("0");
         firstOperand = 0;
         currentOperator = "";
         startNewNumber = true;
+        // TODO: your code here
 
     }
 
@@ -226,24 +204,29 @@ public class Calculator extends JFrame implements ActionListener {
     // ────────────────────────────────────────────────────────────────────────
 
     private void setOperator(String operator) {
-        // Sprint 2
         firstOperand = Double.parseDouble(display.getText());
         currentOperator = operator;
         startNewNumber = true;
+        // Sprint 2
     }
 
     private void computeResult() {
-        // Sprint 2
         if (currentOperator.isEmpty()) {
             return; // No operator set, nothing to compute
         }
         double secondOperand = Double.parseDouble(display.getText());
         double result = 0;
         switch (currentOperator) {
-            case "+" -> result = firstOperand + secondOperand;
-            case "-" -> result = firstOperand - secondOperand;
-            case "*" -> result = firstOperand * secondOperand;
-            case "/" -> {
+            case "+":
+                result = firstOperand + secondOperand;
+                break;
+            case "-":
+                result = firstOperand - secondOperand;
+                break;
+            case "*":
+                result = firstOperand * secondOperand;
+                break;
+            case "/":
                 if (secondOperand == 0) {
                     display.setText("Error");
                     currentOperator = "";
@@ -251,11 +234,9 @@ public class Calculator extends JFrame implements ActionListener {
                     return;
                 }
                 result = firstOperand / secondOperand;
-            }
+                break;
         }
-        display.setText(formatResult(result));
-        currentOperator = "";
-        startNewNumber = true;
+        // Sprint 2
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -263,37 +244,37 @@ public class Calculator extends JFrame implements ActionListener {
     // ────────────────────────────────────────────────────────────────────────
 
     private void backspace() {
-        // Sprint 3
         String current = display.getText();
-        if (current.length() > 1) {
-            display.setText(current.substring(0, current.length() - 1));
-        } else if (current.length() == 1) {
-            display.setText("0");
+        if (!current.equals("0")) {
+            current = current.substring(0, current.length() - 1);
+            if (current.isEmpty()) {
+                current = "0";
+            }
+            display.setText(current);
         }
+        // Sprint 3
     }
 
     private void toggleSign() {
+        double value = Double.parseDouble(display.getText());
+        value *= -1;
+        display.setText(formatResult(value));
         // Sprint 3
-        double currentValue = Double.parseDouble(display.getText());
-        currentValue *= -1;
-        display.setText(formatResult(currentValue));
     }
 
     private void applyPercent() {
+        double value = Double.parseDouble(display.getText());
+        value /= 100;
+        display.setText(formatResult(value));
         // Sprint 3
-        double currentValue = Double.parseDouble(display.getText());
-        currentValue /= 100;
-        display.setText(formatResult(currentValue));
     }
 
     private void appendDecimal() {
-        // Sprint 3
-        if (startNewNumber) {
-            display.setText("0.");
-            startNewNumber = false;
-        } else if (!display.getText().contains(".")) {
-            display.setText(display.getText() + ".");
+        String current = display.getText();
+        if (!current.contains(".")) {
+            display.setText(current + ".");
         }
+        // Sprint 3
     }
 
     // ────────────────────────────────────────────────────────────────────────

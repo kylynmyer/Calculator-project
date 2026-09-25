@@ -15,12 +15,15 @@ import java.awt.event.*;
  *   - You used awt and swing for drawing
  *   - This is the same idea — just buttons instead of a game loop
  */
-public class Calculator extends JFrame implements ActionListener {
+public class notCalculator extends JFrame implements ActionListener {
 
     // ── Step 1: Declare your display field ──────────────────────────────────
     // This is the text box at the top that shows numbers.
     // In Pong you had a score — this is like that, but it shows input too.
     private JTextField display;
+    private final java.util.List<JButton> buttons = new java.util.ArrayList<>();
+    private CalculatorModel model;
+    private CalculatorView view;
 
     // ── Step 2: Declare your state fields ───────────────────────────────────
     // You need to know: what was the first number the user typed?
@@ -51,7 +54,26 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: set the title to "Calculator"
         // TODO: set default close operation to EXIT_ON_CLOSE
         // TODO: set resizable to false
+        setTitle("Calculator");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
 
+        display = new JTextField("0");
+        display.setHorizontalAlignment(JTextField.RIGHT);
+        display.setEditable(false);
+
+        display.setFont(new Font("SansSerif", Font.BOLD, 28));
+        display.setBackground(new Color(30, 30, 30));
+        display.setForeground(Color.WHITE);
+        display.setPreferredSize(new Dimension(300, 70));
+
+        setLayout(new BorderLayout());
+        add(display, BorderLayout.NORTH);
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    
 
         // ── Step 4: Build the display ────────────────────────────────────────
         // TODO: create a new JTextField starting at "0"
@@ -61,6 +83,7 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: set background to new Color(30, 30, 30)   ← dark
         // TODO: set foreground to Color.WHITE
         // TODO: set preferred size to new Dimension(300, 70)
+        di
 
 
         // ── Step 5: Build the button panel ───────────────────────────────────
@@ -73,9 +96,11 @@ public class Calculator extends JFrame implements ActionListener {
         // TODO: complete this loop
         for (String label : BUTTON_LABELS) {
             JButton btn = createButton(label);
+            buttons.add(btn);
+            buttonPanel.add(btn);
             // TODO: add btn to buttonPanel
         }
-
+        add(buttonPanel, BorderLayout.CENTER);
         // ── Step 6: Add display and buttons to the window ────────────────────
         // TODO: set layout to new BorderLayout()
         // TODO: add display to BorderLayout.NORTH
@@ -113,10 +138,38 @@ public class Calculator extends JFrame implements ActionListener {
     //  actionPerformed — called when ANY button is clicked
     // ────────────────────────────────────────────────────────────────────────
 
+    public class CalculatorView extends JFrame {
+        public void setDisplay(String text) {
+            display.setText(text);
+        }
+        public void addButtonListener(ActionListener l) {
+            for (JButton btn : buttons) {
+                btn.addActionListener(l);
+            }
+        }
+        public void show() {
+            setVisible(true);
+        }
+    }
+    public class CalculatorController implements ActionListener {
+        public CalculatorController() {
+            model = new CalculatorModel();
+            view = new CalculatorView();
+            view.addButtonListener(this);
+            view.show();
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         // e.getActionCommand() gives you the button label that was clicked
         String cmd = e.getActionCommand();
+        switch (cmd) {
+            case "=" -> model.computeResult();
+            default -> model.appendDigit(cmd);
+        }
+        view.setDisplay(model.getDisplayValue());
+
 
         // ── Step 8: Route each button to the right method ────────────────────
         // HINT: use a switch statement, just like in Pong you checked
@@ -144,9 +197,26 @@ public class Calculator extends JFrame implements ActionListener {
      *   - If the display currently shows "0", replace it (don't show "07")
      *   - Otherwise, add the digit to the end of what's already there
      */
-    private void appendDigit(String digit) {
-        // TODO: your code here
+    public class CalculatorModel {
+        private double firstOperand = 0;
+        private String currentOperator = "";
+        private boolean startNewNumber = true;
+        private String displayValue = "0";
 
+    
+        private void appendDigit(String digit) {
+            if (startNewNumber) {
+                displayValue = digit;
+                startNewNumber = false;
+            } else {
+                displayValue = displayValue.equals("0") ? digit : displayValue + digit;
+            }
+            // TODO: your code here
+
+        }
+        public String getDisplayValue() {
+            return displayValue;
+        }
     }
 
     /**
@@ -159,6 +229,10 @@ public class Calculator extends JFrame implements ActionListener {
      *   - startNewNumber goes back to true
      */
     private void clearAll() {
+        display.setText("0");
+        firstOperand = 0;
+        currentOperator = "";
+        startNewNumber = true;
         // TODO: your code here
 
     }
@@ -168,10 +242,35 @@ public class Calculator extends JFrame implements ActionListener {
     // ────────────────────────────────────────────────────────────────────────
 
     private void setOperator(String operator) {
+        firstOperand = Double.parseDouble(display.getText());
+        currentOperator = operator;
+        startNewNumber = true;
         // Sprint 2
     }
 
     private void computeResult() {
+        if (currentOperator.isEmpty()) {
+            return; // No operator set, nothing to compute
+        }
+        double secondOperand = Double.parseDouble(display.getText());
+        double result = 0;
+        switch (currentOperator) {
+            case "+" -> result = firstOperand + secondOperand;
+            case "-" -> result = firstOperand - secondOperand;
+            case "*" -> result = firstOperand * secondOperand;
+            case "/" -> {
+                if (secondOperand == 0) {
+                    display.setText("Error");
+                    currentOperator = "";
+                    startNewNumber = true;
+                    return;
+                }
+                result = firstOperand / secondOperand;
+            }
+        }
+        display.setText(formatResult(result));
+        currentOperator = "";
+        startNewNumber = true;
         // Sprint 2
     }
 
@@ -180,18 +279,36 @@ public class Calculator extends JFrame implements ActionListener {
     // ────────────────────────────────────────────────────────────────────────
 
     private void backspace() {
+        String current = display.getText();
+        if (!current.equals("0")) {
+            current = current.substring(0, current.length() - 1);
+            if (current.isEmpty()) {
+                current = "0";
+            }
+            display.setText(current);
+        }
         // Sprint 3
     }
 
     private void toggleSign() {
+        double value = Double.parseDouble(display.getText());
+        value *= -1;
+        display.setText(formatResult(value));
         // Sprint 3
     }
 
     private void applyPercent() {
+        double value = Double.parseDouble(display.getText());
+        value /= 100;
+        display.setText(formatResult(value));
         // Sprint 3
     }
 
     private void appendDecimal() {
+        String current = display.getText();
+        if (!current.contains(".")) {
+            display.setText(current + ".");
+        }
         // Sprint 3
     }
 
