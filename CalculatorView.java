@@ -28,6 +28,9 @@ public class CalculatorView extends JFrame {
 
     // ── Step 1: Declare your UI fields ───────────────────────────────────────
     // TODO: declare display (JTextField) and buttons (JButton[])
+    private JTextField display;
+    private JButton[] buttons = new JButton[20];
+
 
 
     private static final String[] BUTTON_LABELS = {
@@ -43,6 +46,33 @@ public class CalculatorView extends JFrame {
     public CalculatorView() {
         // ── Step 2: Build the window ──────────────────────────────────────────
         // TODO: move all your window setup code here from Calculator.java
+        setTitle("Calculator");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(false);
+
+        display = new JTextField("0");
+        display.setHorizontalAlignment(JTextField.RIGHT);
+        display.setEditable(false);
+        display.setFont(new Font("SansSerif", Font.BOLD, 28));
+        display.setBackground(new Color(30, 30, 30));
+        display.setForeground(Color.WHITE);
+        display.setPreferredSize(new Dimension(300, 70));
+
+        JPanel buttonPanel = new JPanel(new GridLayout(5, 4, 5, 5));
+        buttonPanel.setBackground(new Color(45, 45, 45));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        for (String label : BUTTON_LABELS) {
+            JButton btn = createButton(label);
+            buttonPanel.add(btn);
+        }
+
+        setLayout(new BorderLayout());
+        add(display, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.CENTER);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
         // (title, close operation, resizable, display, buttonPanel, layout)
         // IMPORTANT: do NOT call addActionListener here —
         //            the Controller will do that in addButtonListener()
@@ -62,8 +92,10 @@ public class CalculatorView extends JFrame {
      */
     public void setDisplay(String text) {
         // TODO: your code here
+        display.setText(text);
 
     }
+
 
     /**
      * addButtonListener — registers the Controller as the click listener
@@ -74,6 +106,9 @@ public class CalculatorView extends JFrame {
      */
     public void addButtonListener(ActionListener listener) {
         // TODO: your code here
+        for (JButton btn : buttons) {
+            btn.addActionListener(listener);
+        }
 
     }
 

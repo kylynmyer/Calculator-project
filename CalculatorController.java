@@ -29,6 +29,8 @@ public class CalculatorController implements ActionListener {
 
     // ── Step 1: Declare your Model and View fields ───────────────────────────
     // TODO: declare model (CalculatorModel) and view (CalculatorView)
+    private CalculatorModel model;
+    private CalculatorView view;
 
 
 
@@ -43,6 +45,10 @@ public class CalculatorController implements ActionListener {
         // TODO: call view.addButtonListener(this)
         //       "this" means this Controller is the listener
         // TODO: call view.show() to make the window appear
+        model = new CalculatorModel();
+        view = new CalculatorView();
+        view.addButtonListener(this);
+        view.show();
 
     }
 
@@ -65,12 +71,30 @@ public class CalculatorController implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
-
-        // TODO: write your switch statement here
-        // Route each button to the right model method
-        // Remember to call view.setDisplay(model.getDisplayValue())
-        // at the end
-
+        switch (cmd) {
+            case "C":
+                model.clear();
+                break;
+            case "⌫":
+                model.backspace();
+                break;
+            case ".":
+                model.appendDecimal();
+                break;
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+                model.setOperator(cmd);
+                break;
+            case "=":
+                model.computeResult();
+                break;
+            default: // digits 0-9
+                model.appendDigit(cmd);
+                break;
+        }
+        view.setDisplay(model.getDisplayValue());
     }
 
     // ────────────────────────────────────────────────────────────────────────

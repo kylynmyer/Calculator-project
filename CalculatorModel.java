@@ -23,7 +23,10 @@ public class CalculatorModel {
     // These were in Calculator.java — move them here instead.
     // TODO: declare firstOperand (double), currentOperator (String),
     //       startNewNumber (boolean), and displayValue (String)
-
+    private double firstOperand = 0;
+    private String currentOperator = "";
+    private boolean startNewNumber = true;
+    private String displayValue = "0";
 
 
     // ────────────────────────────────────────────────────────────────────────
@@ -40,14 +43,24 @@ public class CalculatorModel {
      */
     public void appendDigit(String digit) {
         // TODO: your code here
+        if (startNewNumber) {
+            displayValue = digit;
+            startNewNumber = false;
+        } else {
+            displayValue = displayValue.equals("0") ? digit : displayValue + digit;
+        }
 
     }
+    
 
     /**
      * setOperator — stores the operator and first operand
      */
     public void setOperator(String operator) {
         // TODO: your code here
+        firstOperand = parseDisplay();
+        currentOperator = operator;
+        startNewNumber = true;
 
     }
 
@@ -60,6 +73,29 @@ public class CalculatorModel {
      */
     public void computeResult() {
         // TODO: your code here
+        if (currentOperator.isEmpty()) {
+            return; // No operator set, nothing to compute
+        }
+        double secondOperand = parseDisplay();
+        double result = 0;
+        switch (currentOperator) {
+            case "+" -> result = firstOperand + secondOperand;
+            case "-" -> result = firstOperand - secondOperand;
+            case "*" -> result = firstOperand * secondOperand;
+            case "/" -> {
+                if (secondOperand == 0) {
+                    displayValue = "Error";
+                    currentOperator = "";
+                    startNewNumber = true;
+                    return;
+                }
+                result = firstOperand / secondOperand;
+            }
+        }
+        displayValue = formatResult(result);
+        currentOperator = "";
+        startNewNumber = true;
+
 
     }
 
@@ -68,6 +104,10 @@ public class CalculatorModel {
      */
     public void clear() {
         // TODO: your code here
+        displayValue = "0";
+        firstOperand = 0;
+        currentOperator = "";
+        startNewNumber = true;
 
     }
 
@@ -76,6 +116,11 @@ public class CalculatorModel {
      */
     public void backspace() {
         // TODO: your code here
+        if (displayValue.length() > 1) {
+            displayValue = displayValue.substring(0, displayValue.length() - 1);
+        } else if (displayValue.length() == 1) {
+            displayValue = "0";
+        }
 
     }
 
@@ -84,6 +129,9 @@ public class CalculatorModel {
      */
     public void toggleSign() {
         // TODO: your code here
+        double currentValue = parseDisplay();
+        currentValue *= -1;
+        displayValue = formatResult(currentValue);
 
     }
 
@@ -92,6 +140,9 @@ public class CalculatorModel {
      */
     public void applyPercent() {
         // TODO: your code here
+        double currentValue = parseDisplay();
+        currentValue /= 100;
+        displayValue = formatResult(currentValue);
 
     }
 
@@ -100,6 +151,12 @@ public class CalculatorModel {
      */
     public void appendDecimal() {
         // TODO: your code here
+        if (startNewNumber) {
+            displayValue = "0.";
+            startNewNumber = false;
+        } else if (!displayValue.contains(".")) {
+            displayValue = displayValue + ".";
+        }
 
     }
 
@@ -116,8 +173,7 @@ public class CalculatorModel {
      */
     public String getDisplayValue() {
         // TODO: return displayValue
-
-        return "0"; // placeholder — replace this
+        return displayValue; // placeholder — replace this
     }
 
     // ────────────────────────────────────────────────────────────────────────
